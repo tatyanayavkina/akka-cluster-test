@@ -1,7 +1,7 @@
 package com.github.tatyanayavkina.akkaclusterwithsingleton
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
-import com.github.tatyanayavkina.akkaclusterwithsingleton.RabbitMQActor.SendMessage
+import com.github.tatyanayavkina.akkaclusterwithsingleton.RabbitMQActor.{End, SendMessage}
 import com.github.tatyanayavkina.akkaclusterwithsingleton.TheOne.{EndProcess, SendMessageToRabbit}
 
 class TheOne(instance: String, rabbitMQActor: ActorRef) extends Actor with ActorLogging {
@@ -10,6 +10,7 @@ class TheOne(instance: String, rabbitMQActor: ActorRef) extends Actor with Actor
     case SendMessageToRabbit => sendMessage()
     case EndProcess =>
       log.info("Get poison pill")
+      rabbitMQActor ! End
       context.stop(self)
   }
 
