@@ -20,4 +20,5 @@ object Dependencies {
   val akkaRabbitMq = "com.newmotion" %% "akka-rabbitmq" % akkaRabbitMqVersion
   val akkaCluster = "com.typesafe.akka" %% "akka-cluster" % akkaVersion
   val akkaClusterMetrics = "com.typesafe.akka" %% "akka-cluster-metrics" % akkaVersion
+  val akkaClusterTools = "com.typesafe.akka" %% "akka-cluster-tools" % akkaVersion
 }
