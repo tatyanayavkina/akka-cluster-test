@@ -4,7 +4,7 @@ object Dependencies {
   // Versions
   lazy val logbackVersion = "1.2.3"
   lazy val scalaLoggingVersion = "3.9.0"
-  lazy val akkaVersion = "2.5.12"
+  lazy val akkaVersion = "2.5.18"
   lazy val akkaRabbitMqVersion = "5.0.0"
   lazy val commonsCollectionsVersion = "4.1"
   lazy val pureConfigVersion = "0.9.1"
@@ -18,4 +18,6 @@ object Dependencies {
   val scalaTest = "org.scalatest" %% "scalatest" % scalaTestVersion % Test
   val akkaTest = "com.typesafe.akka" %% "akka-testkit" % akkaVersion % Test
   val akkaRabbitMq = "com.newmotion" %% "akka-rabbitmq" % akkaRabbitMqVersion
+  val akkaCluster = "com.typesafe.akka" %% "akka-cluster" % akkaVersion
+  val akkaClusterMetrics = "com.typesafe.akka" %% "akka-cluster-metrics" % akkaVersion
 }

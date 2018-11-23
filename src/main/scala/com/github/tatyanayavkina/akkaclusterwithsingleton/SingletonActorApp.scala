@@ -2,41 +2,39 @@ package com.github.tatyanayavkina.akkaclusterwithsingleton
 
 import java.time.LocalDateTime
 
-import akka.actor.{ActorRef, ActorSystem}
+import akka.actor.ActorSystem
 import com.github.tatyanayavkina.akkaclusterwithsingleton.TheOne.SendMessageToRabbit
 import com.github.tatyanayavkina.akkaclusterwithsingleton.settings.{ProjectSettings, RabbitSettings}
-import com.newmotion.akka.rabbitmq._
+import com.typesafe.config.ConfigFactory
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
 object SingletonActorApp extends App {
-  val projectSettings = pureconfig.loadConfigOrThrow[ProjectSettings]
 
-  implicit val system = ActorSystem("akka-singleton")
-  implicit val executionContext = system.dispatcher
+  startup(Seq("2551", "2552", "0"))
 
-  sys.addShutdownHook {
-    system.terminate()
-    Await.ready(system.whenTerminated, 30.seconds)
-  }
+  def startup(ports: Seq[String]): Unit = {
+    val projectSettings = pureconfig.loadConfigOrThrow[ProjectSettings]
 
-  val rabbitSettings = projectSettings.rabbitSettings
-  val factory = new ConnectionFactory()
-  val rabbitMqConnection = system.actorOf(ConnectionActor.props(factory), "rabbitmq")
-  val publisher = createPublisherAndBind(rabbitMqConnection, rabbitSettings)
+    ports foreach { port =>
 
-  val rabbitMQActor = system.actorOf(RabbitMQActor.props(publisher, rabbitSettings.exchangeType), "rabbit-mq-sender")
-  val theOneActor = system.actorOf(TheOne.props("single-instance", rabbitMQActor), "the-one")
+      val config = ConfigFactory.parseString(
+        s"""
+        akka.remote.artery.canonical.port=$port
+        """).withFallback(ConfigFactory.load())
 
-  system.scheduler.schedule((60 - LocalDateTime.now().getSecond).seconds, 1.minute, theOneActor, SendMessageToRabbit)
+      implicit val system = ActorSystem("akka-singleton-cluster", config)
+      implicit val executionContext = system.dispatcher
 
-  private def createPublisherAndBind(rabbitMqConnection: ActorRef, rabbitSettings: RabbitSettings): ActorRef = {
-    def setupPublisher(channel: Channel, self: ActorRef) {
-      val queue = channel.queueDeclare(rabbitSettings.queueName, true, false, false, null).getQueue
-      channel.queueBind(queue, rabbitSettings.exchangeType, "")
+      sys.addShutdownHook {
+        system.terminate()
+        Await.ready(system.whenTerminated, 30.seconds)
+      }
+
+      val theOneActor = system.actorOf(TheOne.props(s"single-instance-$port", projectSettings.rabbitSettings), "the-one")
+
+      system.scheduler.schedule((60 - LocalDateTime.now().getSecond).seconds, 1.minute, theOneActor, SendMessageToRabbit)
     }
-
-    rabbitMqConnection.createChannel(ChannelActor.props(setupPublisher), Some("publisher"))
   }
 }
