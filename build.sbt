@@ -20,6 +20,7 @@ lazy val root  = (project in file("."))
       akkaRabbitMq,
       akkaCluster,
       akkaClusterMetrics,
+      akkaClusterTools,
       pureConfig
     )
   )
