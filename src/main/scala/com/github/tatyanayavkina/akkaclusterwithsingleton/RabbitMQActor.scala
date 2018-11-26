@@ -8,6 +8,7 @@ import com.newmotion.akka.rabbitmq._
 class RabbitMQActor(rabbitSettings: RabbitSettings) extends Actor with ActorLogging {
 
   private val factory = new ConnectionFactory()
+  factory.setHost(rabbitSettings.host)
   private val rabbitMqConnection = context.actorOf(ConnectionActor.props(factory), "rabbitmq")
   private val publisher = createPublisherAndBind(rabbitMqConnection, rabbitSettings)
 

@@ -1,5 +1,5 @@
 package com.github.tatyanayavkina.akkaclusterwithsingleton.settings
 
-case class RabbitSettings(queueName: String, exchangeType: String)
+case class RabbitSettings(queueName: String, exchangeType: String, host: String)
 
 case class ProjectSettings(rabbitSettings: RabbitSettings)
