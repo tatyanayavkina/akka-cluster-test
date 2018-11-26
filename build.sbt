@@ -10,8 +10,7 @@ lazy val commonSettings = Seq(
 
 lazy val root  = (project in file("."))
   .settings(
-    commonSettings,
-    mainClass in Compile := Some("com.github.tatyanayavkina.akkaclusterwithsingleton.SingletonActorApp")
+    commonSettings
   )
   .settings(
     libraryDependencies ++= Seq(
@@ -19,6 +18,8 @@ lazy val root  = (project in file("."))
       scalaLogging,
       akkaActor,
       akkaRabbitMq,
+      akkaCluster,
+      akkaClusterMetrics,
       pureConfig
     )
   )

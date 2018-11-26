@@ -2,15 +2,18 @@ package com.github.tatyanayavkina.akkaclusterwithsingleton
 
 import java.time.LocalDateTime
 
-import akka.actor.{Actor, ActorLogging, ActorRef, Props}
+import akka.actor.{Actor, ActorLogging, PoisonPill, Props}
 import com.github.tatyanayavkina.akkaclusterwithsingleton.RabbitMQActor.{End, SendMessage}
 import com.github.tatyanayavkina.akkaclusterwithsingleton.TheOne._
+import com.github.tatyanayavkina.akkaclusterwithsingleton.settings.RabbitSettings
 
-class TheOne(instance: String, rabbitMQActor: ActorRef) extends Actor with ActorLogging {
+class TheOne(instance: String, rabbitSettings: RabbitSettings) extends Actor with ActorLogging {
+
+  val rabbitMQActor = context.actorOf(RabbitMQActor.props(rabbitSettings), "rabbit-mq-sender")
 
   override def receive: Receive = {
     case SendMessageToRabbit => sendMessage()
-    case EndProcess =>
+    case PoisonPill =>
       log.info("Get poison pill")
       rabbitMQActor ! End
       context.stop(self)
@@ -28,7 +31,7 @@ object TheOne {
   case object SendMessageToRabbit
   case object EndProcess
 
-  def props(instance: String, rabbitMQActor: ActorRef): Props = Props(new TheOne(instance, rabbitMQActor))
+  def props(instance: String, rabbitSettings: RabbitSettings): Props = Props(new TheOne(instance, rabbitSettings))
 
   import java.time.format.DateTimeFormatter
 
