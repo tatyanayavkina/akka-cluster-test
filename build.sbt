@@ -24,3 +24,18 @@ lazy val root  = (project in file("."))
       pureConfig
     )
   )
+
+scalacOptions ++= Seq(
+  "-deprecation",
+  "-unchecked",
+  "-encoding", "UTF-8",
+  "-Xlint",
+)
+
+version in Docker := "latest"
+dockerExposedPorts in Docker := Seq(2551)
+dockerEntrypoint in Docker := Seq("sh", "-c", "bin/clustering $*")
+
+dockerRepository := Some("tatyanayavkina")
+dockerBaseImage := "java"
+enablePlugins(JavaAppPackaging)
