@@ -17,3 +17,8 @@ Run several containers with docker-compose
 ```
 docker-compose up
 ```
+
+Scale services by docker command
+```
+docker-compose up --scale theone=6
+```

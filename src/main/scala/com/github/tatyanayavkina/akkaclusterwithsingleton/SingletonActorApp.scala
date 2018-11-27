@@ -1,6 +1,7 @@
 package com.github.tatyanayavkina.akkaclusterwithsingleton
 
 import java.time.LocalDateTime
+import java.util.UUID
 
 import akka.actor.{ActorSystem, PoisonPill}
 import akka.cluster.singleton.{ClusterSingletonManager, ClusterSingletonManagerSettings, ClusterSingletonProxy, ClusterSingletonProxySettings}
@@ -26,7 +27,7 @@ object SingletonActorApp extends App {
     }
   })
 
-  val instanceId = s"${config.getString("clustering.ip")}:${config.getString("clustering.port")}"
+  val instanceId = s"${config.getString("akka.remote.netty.tcp.hostname")}-${config.getString("akka.remote.netty.tcp.port")}"
   system.actorOf(ClusterSingletonManager.props(
     singletonProps = TheOne.props(s"single-instance-$instanceId", projectSettings.rabbitSettings),
     terminationMessage = PoisonPill,

@@ -1,38 +1,36 @@
 version: '2'
 services:
-  seed:
+  seed1:
     image: tatyanayavkina/akka-cluster-with-singleton-test:latest
-    ports:
-      - '2551:2551'
+    command: "-Dakka.remote.netty.tcp.hostname=seed1"
     environment:
-      CLUSTER_PORT: 2551
-      CLUSTER_IP: seed
-      SEED_PORT_2551_TCP_ADDR: seed
       RABBIT_IP: rabbitmq
     links:
       - rabbitmq
-  c1:
+  seed2:
     image: tatyanayavkina/akka-cluster-with-singleton-test:latest
-    ports:
-      - '2552:2552'
+    command: "-Dakka.remote.netty.tcp.hostname=seed2"
     environment:
-      CLUSTER_PORT: 2552
-      CLUSTER_IP: c1
-      SEED_PORT_2551_TCP_ADDR: seed
       RABBIT_IP: rabbitmq
     links:
       - rabbitmq
-  c2:
+  seed3:
     image: tatyanayavkina/akka-cluster-with-singleton-test:latest
-    ports:
-      - '2553:2553'
+    command: "-Dakka.remote.netty.tcp.hostname=seed3"
     environment:
-      CLUSTER_PORT: 2553
-      CLUSTER_IP: c2
-      SEED_PORT_2551_TCP_ADDR: seed
       RABBIT_IP: rabbitmq
     links:
       - rabbitmq
+  theone:
+    image: tatyanayavkina/akka-cluster-with-singleton-test:latest
+    command: "-Dakka.remote.netty.tcp.hostname=theone"
+    environment:
+      RABBIT_IP: rabbitmq
+    links:
+      - rabbitmq
+      - seed1
+      - seed2
+      - seed3
   rabbitmq:
    image: rabbitmq:3-management
    ports:
