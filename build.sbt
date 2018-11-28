@@ -1,4 +1,5 @@
 import Dependencies._
+import com.typesafe.sbt.packager.docker.ExecCmd
 
 lazy val commonSettings = Seq(
   name := "akka-cluster-with-singleton-test",
@@ -24,6 +25,9 @@ lazy val root  = (project in file("."))
       pureConfig
     )
   )
+ .settings(
+   mappings in Universal += file("docker.conf") -> "conf/application.conf"
+ )
 
 scalacOptions ++= Seq(
   "-deprecation",
@@ -33,9 +37,9 @@ scalacOptions ++= Seq(
 )
 
 version in Docker := "latest"
-dockerExposedPorts in Docker := Seq(2551)
+dockerExposedPorts in Docker := Seq(2552)
 dockerEntrypoint in Docker := Seq("sh", "-c", "bin/clustering $*")
-
+dockerCommands += ExecCmd("ENTRYPOINT", "/opt/docker/bin/akka-cluster-with-singleton-test", "-Dconfig.file=/opt/docker/conf/application.conf")
 dockerRepository := Some("tatyanayavkina")
 dockerBaseImage := "java"
 enablePlugins(JavaAppPackaging)
